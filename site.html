@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAISON ÉLITE — Costumes Haute Couture</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --deep: #111111;
+    --charcoal: #1a1a1a;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-pale: #f5e6c0;
+    --white: #f8f6f0;
+    --off-white: #ede9e0;
+    --grey: #888880;
+    --grey-light: #bbb9b0;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Montserrat', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+  }
+  .cursor-follower {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.25s ease;
+    opacity: 0.6;
+  }
+
+  /* LOADER */
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 300;
+    letter-spacing: 0.4em;
+    color: var(--white);
+    opacity: 0;
+    animation: loaderFadeIn 1s ease 0.3s forwards;
+  }
+  .loader-sub {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    margin-top: 0.5rem;
+    opacity: 0;
+    animation: loaderFadeIn 1s ease 0.7s forwards;
+    text-transform: uppercase;
+  }
+  .loader-line {
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    margin-top: 2rem;
+    animation: loaderLine 1.8s ease 0.5s forwards;
+  }
+  @keyframes loaderFadeIn { to { opacity: 1; } }
+  @keyframes loaderLine { to { width: 120px; } }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 1.5rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.5s ease, padding 0.3s ease, backdrop-filter 0.5s ease;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(20px);
+    padding: 1rem 4rem;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-links {
+    display: flex;
+    gap: 3rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--grey-light);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0;
+    width: 0; height: 1px;
+    background: var(--gold);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--black);
+    background: var(--gold);
+    padding: 0.7rem 1.8rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .nav-cta:hover { background: var(--gold-light); }
+
+  /* HAMBURGER */
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 25px; height: 1px; background: var(--white); transition: all 0.3s; }
+
+  /* HERO */
+  #hero {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.7) 100%),
+      url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000"><rect fill="%230a0a0a" width="800" height="1000"/><rect x="100" y="50" width="600" height="900" fill="%23111" rx="2"/><rect x="200" y="0" width="400" height="1000" fill="%23151515" opacity="0.5"/><line x1="350" y1="0" x2="350" y2="1000" stroke="%23222" stroke-width="1"/><line x1="450" y1="0" x2="450" y2="1000" stroke="%23222" stroke-width="1"/></svg>');
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.05);
+    transition: transform 8s ease;
+  }
+  #hero.loaded .hero-bg { transform: scale(1); }
+
+  /* Suit silhouette SVG background */
+  .hero-suit-art {
+    position: absolute;
+    right: 5%;
+    bottom: 0;
+    height: 95vh;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 6rem 8rem;
+    max-width: 700px;
+  }
+  .hero-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroReveal 1s ease 2.2s forwards;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 7vw, 7rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: heroReveal 1.2s ease 2.4s forwards;
+  }
+  .hero-title em { font-style: italic; color: var(--gold); }
+  .hero-subtitle {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: var(--grey-light);
+    line-height: 2;
+    max-width: 400px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroReveal 1s ease 2.6s forwards;
+    margin-bottom: 3rem;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroReveal 1s ease 2.8s forwards;
+  }
+  .btn-primary {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 1rem 2.5rem;
+    background: var(--gold);
+    color: var(--black);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold-light);
+    transform: translateX(-101%);
+    transition: transform 0.4s ease;
+  }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-secondary {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 400;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+  }
+  .btn-secondary:hover { color: var(--gold); border-color: var(--gold); }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 3rem;
+    right: 6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    opacity: 0;
+    animation: heroReveal 1s ease 3.2s forwards;
+  }
+  .hero-scroll span {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--grey);
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+  @keyframes heroReveal { to { opacity: 1; transform: translateY(0); } }
+
+  /* ABOUT */
+  #about {
+    padding: 10rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .about-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 6rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8rem;
+    align-items: center;
+  }
+  .about-visual {
+    position: relative;
+    height: 600px;
+  }
+  .about-rect-1 {
+    position: absolute;
+    top: 0; left: 0;
+    width: 75%;
+    height: 85%;
+    background: var(--charcoal);
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .about-rect-2 {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 55%;
+    height: 55%;
+    background: var(--deep);
+    border: 1px solid rgba(201,168,76,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .about-number {
+    font-family: var(--font-display);
+    font-size: 6rem;
+    font-weight: 300;
+    color: var(--gold);
+    opacity: 0.4;
+    line-height: 1;
+  }
+  .about-badge {
+    position: absolute;
+    top: 40%; left: 60%;
+    background: var(--gold);
+    color: var(--black);
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .about-content {}
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-label::before {
+    content: '';
+    width: 30px; height: 1px;
+    background: var(--gold);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 2rem;
+    letter-spacing: 0.02em;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+  .about-text {
+    font-size: 0.82rem;
+    line-height: 2.2;
+    color: var(--grey-light);
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+  }
+  .about-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .stat-item {}
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--grey);
+    text-transform: uppercase;
+    margin-top: 0.4rem;
+  }
+
+  /* COLLECTION */
+  #collection {
+    padding: 8rem 0;
+    background: var(--deep);
+  }
+  .collection-header {
+    text-align: center;
+    padding: 0 6rem 5rem;
+  }
+  .collection-filters {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.5rem;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: transparent;
+    color: var(--grey-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-body);
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--gold);
+    color: var(--black);
+    border-color: var(--gold);
+  }
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    padding: 0 2px;
+  }
+  .product-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    background: var(--charcoal);
+    cursor: pointer;
+  }
+  .product-visual {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.6s ease;
+  }
+  .product-card:hover .product-visual { transform: scale(1.05); }
+  .product-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Suit illustration as CSS art */
+  .suit-art {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .suit-art svg { width: 100%; height: 100%; }
+  .product-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem;
+    transition: all 0.4s ease;
+  }
+  .product-tag {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 0.3rem 0.8rem;
+    background: rgba(0,0,0,0.5);
+  }
+  .product-name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-bottom: 0.3rem;
+    transform: translateY(10px);
+    transition: transform 0.4s ease;
+  }
+  .product-card:hover .product-name { transform: translateY(0); }
+  .product-price {
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    transform: translateY(10px);
+    transition: transform 0.4s ease 0.05s;
+  }
+  .product-card:hover .product-price { transform: translateY(0); }
+  .product-btn {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.7rem 1.5rem;
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.4);
+    cursor: pointer;
+    font-family: var(--font-body);
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.4s ease 0.1s;
+    text-align: left;
+    width: fit-content;
+  }
+  .product-card:hover .product-btn {
+    opacity: 1;
+    transform: translateY(0);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* ELEGANCE */
+  #elegance {
+    padding: 10rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .elegance-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 6rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+  .elegance-text { order: 2; }
+  .elegance-visual { order: 1; }
+  .elegance-quote {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.5vw, 3.5rem);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.3;
+    color: var(--white);
+    margin-bottom: 2rem;
+    position: relative;
+  }
+  .elegance-quote::before {
+    content: '"';
+    position: absolute;
+    top: -1rem; left: -2rem;
+    font-size: 6rem;
+    color: var(--gold);
+    opacity: 0.3;
+    font-family: var(--font-display);
+    line-height: 1;
+  }
+  .elegance-body {
+    font-size: 0.8rem;
+    line-height: 2.2;
+    color: var(--grey-light);
+    margin-bottom: 2.5rem;
+  }
+  .features-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .features-list li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--grey-light);
+  }
+  .features-list li::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+  .elegance-panels {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    height: 600px;
+  }
+  .e-panel {
+    background: var(--charcoal);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .e-panel-content {
+    text-align: center;
+    padding: 2rem;
+  }
+  .e-panel-icon {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    color: var(--gold);
+    opacity: 0.3;
+    margin-bottom: 1rem;
+    font-weight: 300;
+  }
+  .e-panel-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+  }
+  .e-panel-sub {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--grey);
+    text-transform: uppercase;
+  }
+  .e-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, rgba(201,168,76,0.05) 100%);
+  }
+
+  /* PATTERNS GUIDE */
+  #patterns {
+    padding: 8rem 0;
+    background: var(--charcoal);
+  }
+  .patterns-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 6rem;
+  }
+  .patterns-header { text-align: center; margin-bottom: 5rem; }
+  .patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+  }
+  .pattern-card {
+    background: var(--deep);
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s ease;
+    border-top: 2px solid transparent;
+  }
+  .pattern-card:hover {
+    background: var(--black);
+    border-top-color: var(--gold);
+  }
+  .pattern-visual {
+    height: 200px;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .pattern-name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 300;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+  .pattern-desc {
+    font-size: 0.72rem;
+    line-height: 1.9;
+    color: var(--grey-light);
+  }
+
+  /* SVG PATTERNS */
+  .pat-pinstripe { background: repeating-linear-gradient(90deg, #1a1a1a 0px, #1a1a1a 18px, #2a2a2a 18px, #2a2a2a 20px); }
+  .pat-herringbone {
+    background-color: #1a1a1a;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Cpath d='M0 10l10-10 10 10-10 10z' fill='none' stroke='%23333' stroke-width='1'/%3E%3C/svg%3E");
+  }
+  .pat-sharkskin { background: linear-gradient(135deg, #1a1a1a 25%, #222 25%, #222 50%, #1a1a1a 50%, #1a1a1a 75%, #222 75%); background-size: 4px 4px; }
+  .pat-plaid {
+    background-color: #1a1a1a;
+    background-image: linear-gradient(rgba(50,50,50,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(50,50,50,0.8) 1px, transparent 1px), linear-gradient(rgba(201,168,76,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.15) 1px, transparent 1px);
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+  }
+
+  /* TESTIMONIALS */
+  #testimonials {
+    padding: 10rem 0;
+    background: var(--black);
+  }
+  .testimonials-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 6rem;
+  }
+  .testimonials-header { text-align: center; margin-bottom: 5rem; }
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .testimonial-card {
+    background: var(--charcoal);
+    padding: 3rem;
+    position: relative;
+    transition: all 0.4s ease;
+    border-bottom: 2px solid transparent;
+  }
+  .testimonial-card:hover {
+    background: var(--deep);
+    border-bottom-color: var(--gold);
+    transform: translateY(-4px);
+  }
+  .testimonial-quote {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    color: var(--gold);
+    opacity: 0.3;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .testimonial-text {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-style: italic;
+    line-height: 1.8;
+    color: var(--off-white);
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .author-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--black);
+    font-weight: 300;
+  }
+  .author-info {}
+  .author-name {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .author-title { font-size: 0.62rem; color: var(--grey); margin-top: 0.2rem; letter-spacing: 0.05em; }
+  .testimonial-stars {
+    position: absolute;
+    top: 2rem; right: 2rem;
+    display: flex;
+    gap: 3px;
+  }
+  .star {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  }
+
+  /* CTA */
+  #cta {
+    padding: 12rem 0;
+    background: var(--deep);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-display);
+    font-size: clamp(8rem, 15vw, 18rem);
+    font-weight: 300;
+    color: rgba(201,168,76,0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: 0.1em;
+  }
+  .cta-inner { position: relative; z-index: 1; }
+  .cta-eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 6rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.02em;
+  }
+  .cta-title em { font-style: italic; color: var(--gold); }
+  .cta-sub {
+    font-size: 0.8rem;
+    color: var(--grey-light);
+    letter-spacing: 0.1em;
+    margin-bottom: 4rem;
+    line-height: 2;
+  }
+  .cta-buttons {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .btn-gold-outline {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 1rem 2.5rem;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 400;
+    font-family: var(--font-body);
+    transition: all 0.3s ease;
+  }
+  .btn-gold-outline:hover {
+    background: var(--gold);
+    color: var(--black);
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--black);
+    border-top: 1px solid rgba(201,168,76,0.15);
+    padding: 5rem 0 2rem;
+  }
+  .footer-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 6rem;
+  }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+  }
+  .footer-brand-logo {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+  .footer-brand-logo span { color: var(--gold); }
+  .footer-tagline {
+    font-size: 0.7rem;
+    color: var(--grey);
+    line-height: 2;
+    letter-spacing: 0.05em;
+    max-width: 260px;
+  }
+  .footer-social {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .social-link {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,168,76,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--grey);
+    text-decoration: none;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    transition: all 0.3s ease;
+    font-family: var(--font-body);
+  }
+  .social-link:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(201,168,76,0.05);
+  }
+  .footer-col-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 0.8rem; }
+  .footer-links a {
+    font-size: 0.72rem;
+    color: var(--grey-light);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.3s ease;
+  }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-contact-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 1.2rem;
+  }
+  .contact-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .contact-value {
+    font-size: 0.72rem;
+    color: var(--grey-light);
+    letter-spacing: 0.05em;
+  }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer-copy {
+    font-size: 0.62rem;
+    color: var(--grey);
+    letter-spacing: 0.1em;
+  }
+  .footer-legal {
+    display: flex;
+    gap: 2rem;
+  }
+  .footer-legal a {
+    font-size: 0.62rem;
+    color: var(--grey);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.3s ease;
+  }
+  .footer-legal a:hover { color: var(--gold); }
+
+  /* REVEAL ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  /* MOBILE NAV */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,10,0.98);
+    z-index: 999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.3s ease;
+  }
+  .mobile-menu a:hover { color: var(--gold); }
+  .mobile-close {
+    position: absolute;
+    top: 2rem; right: 2rem;
+    font-size: 1.5rem;
+    color: var(--grey);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: var(--font-display);
+    transition: color 0.3s ease;
+  }
+  .mobile-close:hover { color: var(--gold); }
+
+  @media (max-width: 1024px) {
+    nav { padding: 1.5rem 2rem; }
+    nav.scrolled { padding: 1rem 2rem; }
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+    .hero-content { padding: 0 2rem 6rem; }
+    .hero-scroll { right: 2rem; }
+    .about-inner { grid-template-columns: 1fr; gap: 4rem; padding: 0 2rem; }
+    .about-visual { height: 350px; }
+    .products-grid { grid-template-columns: repeat(2, 1fr); }
+    .elegance-inner { grid-template-columns: 1fr; padding: 0 2rem; }
+    .elegance-visual { order: 1; }
+    .elegance-text { order: 2; }
+    .patterns-inner { padding: 0 2rem; }
+    .patterns-grid { grid-template-columns: repeat(2, 1fr); }
+    .testimonials-inner { padding: 0 2rem; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .footer-inner { padding: 0 2rem; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 3rem; }
+    .collection-header { padding: 0 2rem 3rem; }
+  }
+
+  @media (max-width: 600px) {
+    .products-grid { grid-template-columns: 1fr; }
+    .patterns-grid { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr; }
+    .about-stats { flex-direction: column; gap: 1.5rem; }
+    .cta-buttons { flex-direction: column; }
+    .hero-actions { flex-direction: column; align-items: flex-start; }
+    .hero-suit-art { display: none; }
+  }
+
+  /* GOLD LINE DECORATION */
+  .gold-line {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 1.5rem 0;
+  }
+  .gold-line.center { margin: 1.5rem auto; }
+
+  /* STICKY LINE AT TOP */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--gold), var(--gold-light));
+    z-index: 10001;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follower" id="cursorFollower"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-logo">MAISON ÉLITE</div>
+  <div class="loader-sub">Haute Couture — Paris</div>
+  <div class="loader-line"></div>
+</div>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMobileMenu()">✕</button>
+  <a href="#about" onclick="closeMobileMenu()">Maison</a>
+  <a href="#collection" onclick="closeMobileMenu()">Collection</a>
+  <a href="#patterns" onclick="closeMobileMenu()">Matières</a>
+  <a href="#testimonials" onclick="closeMobileMenu()">Témoignages</a>
+  <a href="#cta" onclick="closeMobileMenu()">Rendez-vous</a>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Maison <span>&</span> Élite</a>
+  <ul class="nav-links">
+    <li><a href="#about">Maison</a></li>
+    <li><a href="#collection">Collection</a></li>
+    <li><a href="#patterns">Matières</a></li>
+    <li><a href="#testimonials">Avis</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Prendre RDV</a>
+  <div class="hamburger" onclick="openMobileMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Decorative suit silhouette -->
+  <svg class="hero-suit-art" viewBox="0 0 300 600" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <path d="M150 0 C150 0 120 20 80 40 L60 120 L20 130 L10 300 L80 310 L80 600 L220 600 L220 310 L290 300 L280 130 L240 120 L220 40 C180 20 150 0 150 0Z" stroke="white" stroke-width="0.5" fill="rgba(255,255,255,0.02)"/>
+    <path d="M150 0 L150 200" stroke="white" stroke-width="0.3" opacity="0.5"/>
+    <path d="M80 40 L150 100 L220 40" stroke="white" stroke-width="0.3" opacity="0.5"/>
+    <rect x="120" y="200" width="60" height="8" rx="2" fill="rgba(201,168,76,0.2)"/>
+    <rect x="120" y="220" width="60" height="2" rx="1" fill="rgba(201,168,76,0.1)"/>
+    <rect x="120" y="236" width="60" height="2" rx="1" fill="rgba(201,168,76,0.1)"/>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">Maison Élite — Depuis 1987</div>
+    <h1 class="hero-title">
+      L'élégance<br><em>redéfinie</em>
+    </h1>
+    <p class="hero-subtitle">
+      Des costumes taillés pour les hommes qui refusent l'ordinaire. Chaque couture raconte une histoire de prestige et de caractère.
+    </p>
+    <div class="hero-actions">
+      <a href="#collection" class="btn-primary"><span>Découvrir la collection</span></a>
+      <a href="#about" class="btn-secondary">Notre savoir-faire</a>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Défiler</span>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-inner">
+    <div class="about-visual reveal-left">
+      <div class="about-rect-1">
+        <div style="padding: 3rem; height: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
+          <div style="font-family: var(--font-display); font-size: 0.8rem; letter-spacing: 0.2em; color: var(--gold); opacity: 0.6; text-transform: uppercase;">Façonné à la main</div>
+          <div style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 300; margin-top: 0.5rem; line-height: 1.2;">Le costume parfait<br>naît du détail</div>
+        </div>
+      </div>
+      <div class="about-rect-2">
+        <div class="about-number">37<br><span style="font-size: 1.5rem; opacity: 0.6">ans</span></div>
+      </div>
+      <div class="about-badge">
+        <div>Qualité</div>
+        <div style="font-size: 0.7rem; letter-spacing: 0.05em; font-family: var(--font-display); font-style: italic; margin: 2px 0;">Premium</div>
+        <div>Garantie</div>
+      </div>
+    </div>
+    <div class="about-content reveal-right">
+      <div class="section-label">Notre histoire</div>
+      <h2 class="section-title">L'art du<br><em>costume sur mesure</em></h2>
+      <p class="about-text">
+        Depuis 1987, Maison Élite perpétue un héritage de tailleur d'exception. Chaque costume est pensé, conçu et réalisé par des artisans passionnés qui transforment votre vision en œuvre vestimentaire.
+      </p>
+      <p class="about-text">
+        Nos ateliers à Paris réunissent les meilleurs maîtres-tailleurs, formés aux techniques ancestrales de la haute couture. Nous sélectionnons uniquement des tissus d'exception : laines anglaises, cachemires italiens, soieries françaises.
+      </p>
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-number">2,400+</div>
+          <div class="stat-label">Clients satisfaits</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">48h</div>
+          <div class="stat-label">Délai de mesure</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">12</div>
+          <div class="stat-label">Essayages inclus</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION -->
+<section id="collection">
+  <div class="collection-header reveal">
+    <div class="section-label" style="justify-content: center;">Collection 2025</div>
+    <h2 class="section-title" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">Notre sélection<br><em>exclusive</em></h2>
+    <div class="gold-line center"></div>
+    <div class="collection-filters">
+      <button class="filter-btn active">Tous</button>
+      <button class="filter-btn">Business</button>
+      <button class="filter-btn">Mariage</button>
+      <button class="filter-btn">Soirée</button>
+      <button class="filter-btn">Moderne</button>
+    </div>
+  </div>
+
+  <div class="products-grid">
+
+    <!-- Product 1 -->
+    <div class="product-card reveal">
+      <div class="product-visual">
+        <div class="suit-art">
+          <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="400" height="533" fill="#0d0d0d"/>
+            <rect x="80" y="0" width="240" height="533" fill="#111"/>
+            <!-- suit body -->
+            <path d="M200 60 C200 60 160 80 120 110 L100 200 L70 210 L65 400 L335 400 L330 210 L300 200 L280 110 C240 80 200 60 200 60Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
+            <!-- lapels -->
+            <path d="M200 60 L170 140 L160 200 L200 180 L240 200 L230 140 Z" fill="#222" stroke="#333" stroke-width="0.5"/>
+            <!-- pinstripes -->
+            <line x1="130" y1="0" x2="130" y2="533" stroke="#252525" stroke-width="1"/>
+            <line x1="160" y1="0" x2="160" y2="533" stroke="#252525" stroke-width="1"/>
+            <line x1="190" y1="0" x2="190" y2="533" stroke="#252525" stroke-width="1"/>
+            <line x1="220" y1="0" x2="220" y2="533" stroke="#252525" stroke-width="1"/>
+            <line x1="250" y1="0" x2="250" y2="533" stroke="#252525" stroke-width="1"/>
+            <line x1="280" y1="0" x2="280" y2="533" stroke="#252525" stroke-width="1"/>
+            <!-- pocket square gold hint -->
+            <path d="M220 170 L240 168 L238 185 L218 187Z" fill="rgba(201,168,76,0.6)"/>
+            <!-- buttons -->
+            <circle cx="200" cy="230" r="5" fill="#333" stroke="#444" stroke-width="0.5"/>
+            <circle cx="200" cy="250" r="5" fill="#333" stroke="#444" stroke-width="0.5"/>
+            <!-- bow tie hint -->
+            <path d="M183 125 L197 132 L183 139 Z" fill="#c9a84c" opacity="0.7"/>
+            <path d="M217 125 L203 132 L217 139 Z" fill="#c9a84c" opacity="0.7"/>
+            <rect x="197" y="130" width="6" height="5" fill="#a08030" opacity="0.7"/>
+          </svg>
+        </div>
+      </div>
+      <div class="product-tag">Nouveau</div>
+      <div class="product-overlay">
+        <div class="product-name">Le Parisien</div>
+        <div class="product-price">À partir de 1 890 €</div>
+        <button class="product-btn">Voir plus →</button>
+      </div>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="product-card reveal" style="transition-delay: 0.1s">
+      <div class="product-visual">
+        <div class="suit-art">
+          <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="400" height="533" fill="#0a0807"/>
+            <rect x="60" y="0" width="280" height="533" fill="#140f0a"/>
+            <!-- Herringbone pattern -->
+            <defs>
+              <pattern id="hb" width="10" height="10" patternUnits="userSpaceOnUse">
+                <path d="M0 5 L5 0 L10 5 L5 10Z" fill="none" stroke="#241a10" stroke-width="0.8"/>
+              </pattern>
+            </defs>
+            <rect width="400" height="533" fill="url(#hb)" opacity="0.5"/>
+            <!-- suit -->
+            <path d="M200 50 C200 50 155 75 110 105 L90 195 L60 205 L55 420 L345 420 L340 205 L310 195 L290 105 C245 75 200 50 200 50Z" fill="#1e1510" stroke="#2e2018" stroke-width="1"/>
+            <path d="M200 50 L165 135 L155 195 L200 172 L245 195 L235 135 Z" fill="#241c14" stroke="#342410" stroke-width="0.5"/>
+            <path d="M205 172 L245 195" stroke="#3a2c1a" stroke-width="1.5"/>
+            <!-- tie -->
+            <path d="M195 130 L205 130 L215 195 L200 210 L185 195Z" fill="#8b2020" opacity="0.8"/>
+            <path d="M196 130 L204 130 L200 140Z" fill="#a02828" opacity="0.8"/>
+            <!-- buttons DB -->
+            <circle cx="185" cy="225" r="5" fill="#2a2218" stroke="#3a3228"/>
+            <circle cx="215" cy="225" r="5" fill="#2a2218" stroke="#3a3228"/>
+            <circle cx="185" cy="250" r="5" fill="#2a2218" stroke="#3a3228"/>
+            <circle cx="215" cy="250" r="5" fill="#2a2218" stroke="#3a3228"/>
+          </svg>
+        </div>
+      </div>
+      <div class="product-tag">Mariage</div>
+      <div class="product-overlay">
+        <div class="product-name">L'Alliance</div>
+        <div class="product-price">À partir de 2 450 €</div>
+        <button class="product-btn">Voir plus →</button>
+      </div>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="product-card reveal" style="transition-delay: 0.2s">
+      <div class="product-visual">
+        <div class="suit-art">
+          <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="400" height="533" fill="#090c0f"/>
+            <rect x="70" y="0" width="260" height="533" fill="#0d1218"/>
+            <!-- plaid pattern -->
+            <defs>
+              <pattern id="pl" width="40" height="40" patternUnits="userSpaceOnUse">
+                <rect width="40" height="40" fill="none"/>
+                <line x1="0" y1="20" x2="40" y2="20" stroke="#1a2030" stroke-width="1"/>
+                <line x1="20" y1="0" x2="20" y2="40" stroke="#1a2030" stroke-width="1"/>
+                <line x1="0" y1="40" x2="40" y2="0" stroke="#c9a84c" stroke-width="0.3" opacity="0.3"/>
+              </pattern>
+            </defs>
+            <rect width="400" height="533" fill="url(#pl)"/>
+            <path d="M200 55 C200 55 158 78 112 108 L92 198 L62 208 L57 415 L343 415 L338 208 L308 198 L288 108 C242 78 200 55 200 55Z" fill="#101520" stroke="#1a2535" stroke-width="1"/>
+            <path d="M200 55 L168 138 L158 198 L200 175 L242 198 L232 138 Z" fill="#141a25" stroke="#1e2a38" stroke-width="0.5"/>
+            <!-- white shirt & gold tie -->
+            <path d="M188 125 L212 125 L218 195 L200 210 L182 195Z" fill="#e8e4d8" opacity="0.9"/>
+            <path d="M196 125 L204 125 L200 135Z" fill="#ddd8cc"/>
+            <path d="M196 130 L204 130 L210 185 L200 198 L190 185Z" fill="#c9a84c" opacity="0.9"/>
+            <path d="M197 130 L203 130 L200 138Z" fill="#a08030"/>
+            <circle cx="200" cy="235" r="5" fill="#171d28" stroke="#252f3e"/>
+            <circle cx="200" cy="255" r="5" fill="#171d28" stroke="#252f3e"/>
+          </svg>
+        </div>
+      </div>
+      <div class="product-tag">Best-seller</div>
+      <div class="product-overlay">
+        <div class="product-name">Le Stratège</div>
+        <div class="product-price">À partir de 1 650 €</div>
+        <button class="product-btn">Voir plus →</button>
+      </div>
+    </div>
+
+    <!-- Product 4 -->
+    <div class="product-card reveal" style="transition-delay: 0.15s">
+      <div class="product-visual">
+        <div class="suit-art">
+          <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="400" height="533" fill="#080808"/>
+            <rect x="50" y="0" width="300" height="533" fill="#0e0e0e"/>
+            <path d="M200 45 C200 45 152 72 108 105 L85 200 L55 212 L50 430 L350 430 L345 212 L315 200 L292 105 C248 72 200 45 200 45Z" fill="#141414" stroke="#2a2a2a" stroke-width="1.5"/>
+            <!-- Tuxedo shawl lapel -->
+            <path d="M200 45 L158 155 L148 200 L200 168 L252 200 L242 155 Z" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
+            <!-- Satin sheen on lapel -->
+            <path d="M200 45 L160 130 L155 155" stroke="rgba(255,255,255,0.1)" stroke-width="3" fill="none"/>
+            <!-- Bow tie -->
+            <path d="M180 100 L197 108 L180 116 Z" fill="#111" stroke="#333" stroke-width="0.5"/>
+            <path d="M220 100 L203 108 L220 116 Z" fill="#111" stroke="#333" stroke-width="0.5"/>
+            <rect x="197" y="106" width="6" height="5" fill="#0a0a0a" stroke="#222"/>
+            <!-- pocket square -->
+            <path d="M235 168 L255 165 L253 185 L233 188Z" fill="rgba(255,255,255,0.8)"/>
+            <!-- shirt white -->
+            <rect x="190" y="100" width="20" height="80" fill="#f0ece2" opacity="0.15"/>
+            <!-- Studs -->
+            <circle cx="200" cy="135" r="3" fill="#c9a84c"/>
+            <circle cx="200" cy="150" r="3" fill="#c9a84c"/>
+            <circle cx="200" cy="165" r="3" fill="#c9a84c"/>
+            <circle cx="200" cy="245" r="6" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+      <div class="product-tag">Soirée</div>
+      <div class="product-overlay">
+        <div class="product-name">Le Gala</div>
+        <div class="product-price">À partir de 3 200 €</div>
+        <button class="product-btn">Voir plus →</button>
+      </div>
+    </div>
+
+    <!-- Product 5 -->
+    <div class="product-card reveal" style="transition-delay: 0.25s">
+      <div class="product-visual">
+        <div class="suit-art">
+          <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="400" height="533" fill="#080a06"/>
+            <rect x="60" y="0" width="280" height="533" fill="#0d0f0a"/>
+            <defs>
+              <pattern id="sk" width="4" height="4" patternUnits="userSpaceOnUse">
+                <rect width="4" height="4" fill="#0f120c"/>
+                <rect x="0" y="0" width="2" height="2" fill="#131610"/>
+                <rect x="2" y="2" width="2" height="2" fill="#131610"/>
+              </pattern>
+            </defs>
+            <rect width="400" height="533" fill="url(#sk)"/>
+            <path d="M200 52 C200 52 156 76 110 108 L88 200 L58 212 L53 425 L347 425 L342 212 L312 200 L290 108 C244 76 200 52 200 52Z" fill="#111410" stroke="#1e2018" stroke-width="1"/>
+            <path d="M200 52 L162 140 L152 200 L200 175 L248 200 L238 140 Z" fill="#161910" stroke="#222518" stroke-width="0.5"/>
+            <!-- Ivory shirt -->
+            <path d="M190 128 L210 128 L216 196 L200 210 L184 196Z" fill="#f5f0e8" opacity="0.9"/>
+            <path d="M197 128 L203 128 L200 138Z" fill="#e8e0d0"/>
+            <!-- dark green tie -->
+            <path d="M196 132 L204 132 L210 188 L200 200 L190 188Z" fill="#1a3a1a" opacity="0.85"/>
+            <path d="M197 132 L203 132 L200 140Z" fill="#0f2510"/>
+            <!-- pin on lapel -->
+            <circle cx="172" cy="162" r="3" fill="#c9a84c" stroke="#a08030" stroke-width="0.5"/>
+            <line x1="172" y1="165" x2="172" y2="178" stroke="#c9a84c" stroke-width="1"/>
+            <circle cx="200" cy="238" r="5" fill="#181c14" stroke="#282c20"/>
+            <circle cx="200" cy="258" r="5" fill="#181c14" stroke="#282c20"/>
+          </svg>
+        </div>
+      </div>
+      <div class="product-tag">Exclusif</div>
+      <div class="product-overlay">
+        <div class="product-name">Le Diplomat</div>
+        <div class="product-price">À partir de 2 100 €</div>
+        <button class="product-btn">Voir plus →</button>
+      </div>
+    </div>
+
+    <!-- Product 6 -->
+    <div class="product-card reveal" style="transition-delay: 0.3s">
+      <div class="product-visual">
+        <div class="suit-art">
+          <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="400" height="533" fill="#0c0a08"/>
+            <rect x="70" y="0" width="260" height="533" fill="#150f08"/>
+            <!-- warm brown -->
+            <defs>
+              <pattern id="br" width="8" height="8" patternUnits="userSpaceOnUse">
+                <rect width="8" height="8" fill="#150f08"/>
+                <path d="M0 4 L4 0 L8 4 L4 8Z" fill="none" stroke="#1e1508" stroke-width="0.8"/>
+              </pattern>
+            </defs>
+            <rect width="400" height="533" fill="url(#br)"/>
+            <path d="M200 50 C200 50 154 75 108 108 L86 198 L56 210 L51 428 L349 428 L344 210 L314 198 L292 108 C246 75 200 50 200 50Z" fill="#1e1510" stroke="#2e2018" stroke-width="1"/>
+            <path d="M200 50 L164 138 L154 198 L200 172 L246 198 L236 138 Z" fill="#241c12" stroke="#342c1a" stroke-width="0.5"/>
+            <!-- turtle neck suggestion -->
+            <path d="M182 95 Q200 88 218 95 L225 128 L175 128Z" fill="#e8d8b0" opacity="0.7"/>
+            <!-- DB double breasted -->
+            <circle cx="183" cy="220" r="6" fill="#1e1810" stroke="#2e2820"/>
+            <circle cx="217" cy="220" r="6" fill="#1e1810" stroke="#2e2820"/>
+            <circle cx="183" cy="245" r="6" fill="#1e1810" stroke="#2e2820"/>
+            <circle cx="217" cy="245" r="6" fill="#1e1810" stroke="#2e2820"/>
+            <circle cx="183" cy="270" r="6" fill="#1e1810" stroke="#2e2820"/>
+            <circle cx="217" cy="270" r="6" fill="#1e1810" stroke="#2e2820"/>
+            <!-- watch hint -->
+            <rect x="270" y="180" width="28" height="20" rx="4" fill="#c9a84c" opacity="0.4"/>
+            <rect x="274" y="184" width="20" height="12" rx="2" fill="#111" opacity="0.7"/>
+          </svg>
+        </div>
+      </div>
+      <div class="product-tag">Moderne</div>
+      <div class="product-overlay">
+        <div class="product-name">L'Avant-garde</div>
+        <div class="product-price">À partir de 1 980 €</div>
+        <button class="product-btn">Voir plus →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ELEGANCE SECTION -->
+<section id="elegance">
+  <div class="elegance-inner">
+    <div class="elegance-visual reveal-left">
+      <div class="elegance-panels">
+        <div class="e-panel">
+          <div class="e-panel-content">
+            <div class="e-panel-icon">✦</div>
+            <div class="e-panel-title">Tissu d'exception</div>
+            <div class="e-panel-sub">Sélection mondiale</div>
+          </div>
+        </div>
+        <div class="e-panel">
+          <div class="e-panel-content">
+            <div class="e-panel-icon">◈</div>
+            <div class="e-panel-title">Sur mesure absolu</div>
+            <div class="e-panel-sub">Votre silhouette, vos règles</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="elegance-text reveal-right">
+      <div class="section-label">Philosophie</div>
+      <div class="elegance-quote">
+        Un homme bien habillé ne se remarque pas — il s'impose.
+      </div>
+      <p class="elegance-body">
+        Chaque détail compte. De la qualité du bouton à la tension du fil, de l'angle du revers à la profondeur des poches — c'est l'accumulation de ces micro-perfections qui crée un costume mémorable.
+      </p>
+      <ul class="features-list">
+        <li>Tissus sélectionnés en Angleterre, Italie et France</li>
+        <li>Doublure en soie naturelle sur chaque modèle</li>
+        <li>Couture main pour les parties structurantes</li>
+        <li>Boutons en corne ou nacre selon vos préférences</li>
+        <li>Livraison sous 6 à 8 semaines avec essayages</li>
+      </ul>
+      <div style="margin-top: 3rem;">
+        <a href="#cta" class="btn-primary"><span>Prendre rendez-vous</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PATTERNS -->
+<section id="patterns">
+  <div class="patterns-inner">
+    <div class="patterns-header reveal">
+      <div class="section-label" style="justify-content: center;">Nos matières</div>
+      <h2 class="section-title" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">Guide des <em>motifs</em></h2>
+      <div class="gold-line center"></div>
+    </div>
+    <div class="patterns-grid">
+      <div class="pattern-card reveal">
+        <div class="pattern-visual pat-pinstripe"></div>
+        <div class="pattern-name">Pinstripe</div>
+        <p class="pattern-desc">Affirmez votre stature avec cette rayure fine qui étire la silhouette. Idéal pour les environnements corporate où l'autorité doit transparaître naturellement.</p>
+      </div>
+      <div class="pattern-card reveal" style="transition-delay: 0.1s">
+        <div class="pattern-visual pat-herringbone"></div>
+        <div class="pattern-name">Chevron</div>
+        <p class="pattern-desc">Le motif en V crée une profondeur subtile et une texture sophistiquée. Élégance discrète pour celui qui connaît les codes sans avoir besoin de les afficher.</p>
+      </div>
+      <div class="pattern-card reveal" style="transition-delay: 0.2s">
+        <div class="pattern-visual pat-sharkskin"></div>
+        <div class="pattern-name">Sharkskin</div>
+        <p class="pattern-desc">Les légères variations de nuances donnent au tissu un éclat secret. Parfait premier motif pour qui souhaite se démarquer avec subtilité.</p>
+      </div>
+      <div class="pattern-card reveal" style="transition-delay: 0.3s">
+        <div class="pattern-visual pat-plaid"></div>
+        <div class="pattern-name">Plaid</div>
+        <p class="pattern-desc">Le juste équilibre entre caractère et sobriété. Plus affirmé que le sharkskin, plus discret que le pinstripe — le compromis du connaisseur.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="testimonials-inner">
+    <div class="testimonials-header reveal">
+      <div class="section-label" style="justify-content: center;">Témoignages</div>
+      <h2 class="section-title" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">Ce que disent<br><em>nos clients</em></h2>
+      <div class="gold-line center"></div>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="testimonial-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+        <div class="testimonial-quote">"</div>
+        <p class="testimonial-text">Mon costume de mariage était au-delà de mes espérances. Chaque détail reflétait qui je suis. Le jour J, j'ai reçu des compliments de personnes que je ne connaissais même pas.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">A</div>
+          <div class="author-info">
+            <div class="author-name">Alexandre Moreau</div>
+            <div class="author-title">Directeur Financier, Paris</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal" style="transition-delay: 0.1s">
+        <div class="testimonial-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+        <div class="testimonial-quote">"</div>
+        <p class="testimonial-text">Depuis que je porte un costume Maison Élite en réunion, ma posture a changé. Ce n'est pas de la vanité — c'est de la confiance incarnée dans la coupe impeccable.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">K</div>
+          <div class="author-info">
+            <div class="author-name">Karim El Fassi</div>
+            <div class="author-title">Entrepreneur, Casablanca</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal" style="transition-delay: 0.2s">
+        <div class="testimonial-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+        <div class="testimonial-quote">"</div>
+        <p class="testimonial-text">Un investissement, pas une dépense. Mon premier costume Maison Élite a 8 ans et il est encore impeccable. Le service après-vente et les retouches incluses font toute la différence.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">T</div>
+          <div class="author-info">
+            <div class="author-name">Thomas Bertrand</div>
+            <div class="author-title">Avocat associé, Lyon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-bg-text">ÉLITE</div>
+  <div class="cta-inner reveal">
+    <div class="cta-eyebrow">Votre transformation commence ici</div>
+    <h2 class="cta-title">Révélez votre<br><em>stature</em></h2>
+    <p class="cta-sub">
+      Prenez rendez-vous dans notre atelier parisien.<br>
+      Consultation gratuite. Résultat inoubliable.
+    </p>
+    <div class="cta-buttons">
+      <a href="#" class="btn-primary"><span>Prendre rendez-vous</span></a>
+      <a href="tel:+33142000000" class="btn-gold-outline">+33 1 42 00 00 00</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-logo">Maison <span>&</span> Élite</div>
+        <p class="footer-tagline">L'art du costume sur mesure depuis 1987. Créateurs d'élégance masculine pour les hommes qui exigent l'excellence.</p>
+        <div class="footer-social">
+          <a href="#" class="social-link">In</a>
+          <a href="#" class="social-link">Ig</a>
+          <a href="#" class="social-link">Fb</a>
+          <a href="#" class="social-link">Wa</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Navigation</div>
+        <ul class="footer-links">
+          <li><a href="#about">Notre maison</a></li>
+          <li><a href="#collection">Collection</a></li>
+          <li><a href="#patterns">Les matières</a></li>
+          <li><a href="#testimonials">Témoignages</a></li>
+          <li><a href="#cta">Rendez-vous</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Services</div>
+        <ul class="footer-links">
+          <li><a href="#">Sur mesure absolu</a></li>
+          <li><a href="#">Prêt-à-porter haut de gamme</a></li>
+          <li><a href="#">Costume de mariage</a></li>
+          <li><a href="#">Tenue de soirée</a></li>
+          <li><a href="#">Entretien & retouches</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <div class="footer-contact-item">
+          <span class="contact-label">Atelier</span>
+          <span class="contact-value">10 Rue du Faubourg Saint-Honoré, Paris 75008</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="contact-label">Téléphone</span>
+          <span class="contact-value">+33 1 42 00 00 00</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="contact-label">Email</span>
+          <span class="contact-value">contact@maisonelite.fr</span>
+        </div>
+        <div class="footer-contact-item">
+          <span class="contact-label">Horaires</span>
+          <span class="contact-value">Lun–Sam : 10h–19h</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Maison & Élite. Tous droits réservés.</span>
+      <div class="footer-legal">
+        <a href="#">Mentions légales</a>
+        <a href="#">Politique de confidentialité</a>
+        <a href="#">CGV</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // LOADER
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+      document.getElementById('hero').classList.add('loaded');
+    }, 2000);
+  });
+
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const cursorFollower = document.getElementById('cursorFollower');
+  let mouseX = 0, mouseY = 0;
+  let followerX = 0, followerY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top = mouseY + 'px';
+  });
+
+  function animateCursor() {
+    followerX += (mouseX - followerX) * 0.12;
+    followerY += (mouseY - followerY) * 0.12;
+    cursorFollower.style.left = followerX + 'px';
+    cursorFollower.style.top = followerY + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // Cursor hover effect
+  document.querySelectorAll('a, button, .product-card, .pattern-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(2)';
+      cursorFollower.style.transform = 'translate(-50%, -50%) scale(1.5)';
+      cursorFollower.style.borderColor = 'var(--gold-light)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+      cursorFollower.style.transform = 'translate(-50%, -50%) scale(1)';
+      cursorFollower.style.borderColor = 'var(--gold)';
+    });
+  });
+
+  // NAV STICKY
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 80) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+  });
+
+  // PROGRESS BAR
+  const progressBar = document.getElementById('progressBar');
+  window.addEventListener('scroll', () => {
+    const scrollPct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+    progressBar.style.width = scrollPct + '%';
+  });
+
+  // REVEAL ON SCROLL
+  const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // FILTER BUTTONS
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // MOBILE MENU
+  function openMobileMenu() {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMobileMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // PARALLAX on hero
+  window.addEventListener('scroll', () => {
+    const heroEl = document.getElementById('hero');
+    const heroBg = heroEl.querySelector('.hero-bg');
+    const scrolled = window.scrollY;
+    if (scrolled < window.innerHeight) {
+      heroBg.style.transform = `scale(1) translateY(${scrolled * 0.3}px)`;
+    }
+  });
+</script>
+</body>
+</html>
