@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Master</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--c1:#000810;--c2:#001428;--c3:#051f3a;
+--blue:#0af;--cyan:#0ff;--glow:#00d4ff;
+--text:#e8f4ff;--muted:#6a9bbf;
+--font:'Exo 2',sans-serif;--mono:'Share Tech Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--c1);color:var(--text);font-family:var(--font);overflow-x:hidden;cursor:none}
+
+/* CUSTOM CURSOR */
+#cursor{position:fixed;width:8px;height:8px;background:var(--cyan);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .15s;mix-blend-mode:screen}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(0,255,255,.4);border-radius:50%;pointer-events:none;z-index:9998;transition:transform .08s,opacity .3s}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:#000;z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s}
+.loader-logo{font-size:3rem;font-weight:900;letter-spacing:.3em;color:var(--cyan);text-shadow:0 0 40px var(--cyan);font-family:'Rajdhani',sans-serif}
+.loader-bar{width:280px;height:2px;background:#111;margin-top:2rem;overflow:hidden;border-radius:1px}
+.loader-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));width:0%;transition:width 2.4s ease}
+.loader-text{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:.8rem;letter-spacing:.15em}
+
+/* NAVBAR */
+#nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 3rem;display:flex;align-items:center;justify-content:space-between;transition:background .4s,backdrop-filter .4s}
+#nav.scrolled{background:rgba(0,8,16,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,170,255,.1)}
+.nav-logo{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:var(--cyan);letter-spacing:.2em;text-shadow:0 0 20px var(--cyan)}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;font-weight:500}
+.nav-links a:hover{color:var(--cyan)}
+.nav-cta{background:transparent;border:1px solid var(--cyan);color:var(--cyan);padding:.5rem 1.5rem;font-family:var(--font);font-size:.8rem;letter-spacing:.15em;cursor:pointer;transition:all .3s;text-transform:uppercase}
+.nav-cta:hover{background:rgba(0,255,255,.1);box-shadow:0 0 20px rgba(0,255,255,.3)}
+
+/* SECTIONS */
+section{padding:6rem 5%;position:relative;overflow:hidden}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0}
+#canvas3d{position:absolute;inset:0;width:100%;height:100%}
+.hero-content{position:relative;z-index:10;text-align:center;padding:2rem}
+.hero-tag{font-family:var(--mono);font-size:.75rem;color:var(--cyan);letter-spacing:.3em;text-transform:uppercase;margin-bottom:1.5rem;opacity:.8}
+.hero-title{font-family:'Rajdhani',sans-serif;font-size:clamp(3.5rem,8vw,7rem);font-weight:700;line-height:1;letter-spacing:.05em;margin-bottom:1.5rem;background:linear-gradient(135deg,#fff 30%,var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:clamp(.9rem,2vw,1.15rem);color:var(--muted);max-width:580px;margin:0 auto 2.5rem;line-height:1.6;font-weight:300}
+.hero-btns{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#000;border:none;padding:.9rem 2.2rem;font-family:var(--font);font-weight:700;font-size:.9rem;letter-spacing:.1em;cursor:pointer;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));transition:all .3s;text-transform:uppercase}
+.btn-primary:hover{box-shadow:0 0 30px rgba(0,170,255,.6);transform:translateY(-2px)}
+.btn-outline{background:transparent;border:1px solid rgba(0,170,255,.5);color:var(--blue);padding:.9rem 2.2rem;font-family:var(--font);font-size:.9rem;letter-spacing:.1em;cursor:pointer;transition:all .3s;text-transform:uppercase}
+.btn-outline:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 20px rgba(0,255,255,.2)}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:.5;animation:bounce 2s infinite}
+.scroll-hint span{width:1px;height:50px;background:linear-gradient(180deg,var(--cyan),transparent)}
+.scroll-hint p{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--muted)}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+
+/* GRID BG */
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(0,170,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,170,255,.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
+
+/* SECTION HEADERS */
+.sec-label{font-family:var(--mono);font-size:.7rem;color:var(--cyan);letter-spacing:.3em;text-transform:uppercase;display:block;margin-bottom:.8rem;opacity:.7}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;margin-bottom:1rem;line-height:1.1}
+.sec-title span{color:var(--cyan)}
+.sec-sub{color:var(--muted);max-width:540px;line-height:1.7;font-weight:300}
+.sec-header{margin-bottom:4rem}
+
+/* ABOUT */
+#about{background:var(--c2)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.about-visual{position:relative}
+.hexgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.hex{aspect-ratio:1;border:1px solid rgba(0,170,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1.5rem;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);background:rgba(0,20,40,.8);transition:all .4s;cursor:default}
+.hex:hover{background:rgba(0,100,200,.15);border-color:var(--cyan);box-shadow:0 0 30px rgba(0,255,255,.15)}
+.hex-icon{font-size:1.8rem}
+.hex-val{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:var(--cyan)}
+.hex-label{font-size:.7rem;color:var(--muted);text-align:center;letter-spacing:.05em}
+.about-text p{color:var(--muted);line-height:1.8;margin-bottom:1.2rem;font-weight:300}
+.tag-list{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.5rem}
+.tag{font-family:var(--mono);font-size:.7rem;border:1px solid rgba(0,170,255,.3);color:var(--blue);padding:.3rem .8rem;letter-spacing:.05em}
+
+/* SERVICES */
+#services{background:var(--c1)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem}
+.svc-card{background:linear-gradient(135deg,rgba(0,20,40,.9),rgba(0,8,20,.9));border:1px solid rgba(0,170,255,.12);padding:2rem;position:relative;overflow:hidden;transition:all .4s;cursor:default}
+.svc-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,170,255,.05),transparent);opacity:0;transition:opacity .4s}
+.svc-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);transform:scaleX(0);transition:transform .4s}
+.svc-card:hover::before{opacity:1}
+.svc-card:hover::after{transform:scaleX(1)}
+.svc-card:hover{border-color:rgba(0,255,255,.3);box-shadow:0 0 40px rgba(0,170,255,.1);transform:translateY(-4px)}
+.svc-icon{font-size:2.2rem;margin-bottom:1.2rem;display:block;filter:drop-shadow(0 0 8px rgba(0,200,255,.5));transition:filter .4s}
+.svc-card:hover .svc-icon{filter:drop-shadow(0 0 16px var(--cyan))}
+.svc-title{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.8rem;color:#fff}
+.svc-desc{font-size:.85rem;color:var(--muted);line-height:1.6;font-weight:300}
+.svc-num{position:absolute;top:1rem;right:1.5rem;font-family:var(--mono);font-size:.7rem;color:rgba(0,170,255,.25);letter-spacing:.1em}
+
+/* STATS */
+#stats{background:linear-gradient(180deg,var(--c1),var(--c2))}
+.stats-inner{position:relative;border:1px solid rgba(0,170,255,.1);padding:4rem;display:grid;grid-template-columns:repeat(4,1fr);gap:3rem;text-align:center}
+.stats-inner::before{content:'';position:absolute;inset:-1px;background:linear-gradient(135deg,rgba(0,170,255,.1),transparent,rgba(0,255,255,.05));pointer-events:none}
+.stat-val{font-family:'Rajdhani',sans-serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:700;color:var(--cyan);display:block;line-height:1;text-shadow:0 0 30px rgba(0,255,255,.4)}
+.stat-label{font-size:.8rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.5rem;display:block}
+.stat-plus{color:var(--blue);font-size:.7em}
+
+/* INFRA */
+#infra{background:var(--c3);position:relative;overflow:hidden}
+#netcanvas{position:absolute;inset:0;opacity:.6}
+.infra-content{position:relative;z-index:2}
+.infra-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;margin-top:3rem}
+.infra-nodes{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.inode{border:1px solid rgba(0,170,255,.2);padding:1.2rem;background:rgba(0,10,25,.7);backdrop-filter:blur(10px)}
+.inode-status{width:8px;height:8px;background:#0f0;border-radius:50%;display:inline-block;margin-right:.5rem;box-shadow:0 0 8px #0f0;animation:pulse 2s infinite}
+.inode-name{font-size:.85rem;font-weight:600;margin-bottom:.3rem}
+.inode-detail{font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* TESTIMONIALS */
+#testimonials{background:var(--c1)}
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}
+.testi-card{background:linear-gradient(135deg,rgba(0,30,60,.6),rgba(0,10,25,.8));border:1px solid rgba(0,170,255,.12);padding:2rem;backdrop-filter:blur(10px);position:relative}
+.testi-card::before{content:'❝';position:absolute;top:1rem;right:1.5rem;font-size:3rem;color:rgba(0,170,255,.1);font-family:serif}
+.testi-text{font-size:.9rem;line-height:1.7;color:var(--muted);font-style:italic;margin-bottom:1.5rem;font-weight:300}
+.testi-author{display:flex;align-items:center;gap:.8rem}
+.testi-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#000;font-family:'Rajdhani',sans-serif}
+.testi-name{font-weight:600;font-size:.9rem}
+.testi-role{font-size:.75rem;color:var(--muted)}
+.stars{color:var(--cyan);font-size:.8rem;margin-bottom:1rem;letter-spacing:.1em}
+
+/* CONTACT */
+#contact{background:var(--c2)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+.contact-info p{color:var(--muted);margin-bottom:2rem;line-height:1.7;font-weight:300}
+.contact-item{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.5rem}
+.ci-icon{font-size:1.2rem;color:var(--cyan);margin-top:.1rem}
+.ci-label{font-size:.75rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.ci-val{font-size:.9rem;font-weight:500}
+.contact-form{display:flex;flex-direction:column;gap:1.2rem}
+.form-group{position:relative}
+.form-group input,.form-group textarea{width:100%;background:rgba(0,20,40,.6);border:1px solid rgba(0,170,255,.15);color:var(--text);font-family:var(--font);font-size:.9rem;padding:1rem 1.2rem;outline:none;transition:border-color .3s;resize:none}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--cyan)}
+.form-group textarea{height:120px}
+.form-group label{position:absolute;top:1rem;left:1.2rem;color:var(--muted);font-size:.85rem;transition:all .3s;pointer-events:none}
+.form-group input:focus~label,.form-group input:not(:placeholder-shown)~label,
+.form-group textarea:focus~label,.form-group textarea:not(:placeholder-shown)~label{top:-.5rem;left:.8rem;font-size:.7rem;color:var(--cyan);background:var(--c2);padding:0 .4rem}
+.form-group input::placeholder,.form-group textarea::placeholder{color:transparent}
+
+/* FOOTER */
+footer{background:#000;border-top:1px solid rgba(0,170,255,.1);padding:3rem 5%;text-align:center}
+.footer-logo{font-family:'Rajdhani',sans-serif;font-size:1.8rem;color:var(--cyan);font-weight:700;letter-spacing:.3em;text-shadow:0 0 20px var(--cyan);margin-bottom:1rem}
+.footer-sub{font-size:.8rem;color:var(--muted);margin-bottom:2rem}
+.social-links{display:flex;gap:1rem;justify-content:center;margin-bottom:2rem}
+.social-btn{width:40px;height:40px;border:1px solid rgba(0,170,255,.2);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;transition:all .3s;color:var(--muted)}
+.social-btn:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 15px rgba(0,255,255,.3)}
+.footer-copy{font-family:var(--mono);font-size:.7rem;color:rgba(100,150,200,.3);letter-spacing:.1em}
+
+/* SCROLL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(30px);transition:all .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:all .7s ease}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(40px);transition:all .7s ease}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+
+/* SCAN LINE */
+.scan-line{position:absolute;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,255,.4),transparent);top:0;animation:scan 8s linear infinite;pointer-events:none}
+@keyframes scan{0%{top:0;opacity:.6}100%{top:100%;opacity:0}}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+.about-grid,.infra-grid,.contact-grid{grid-template-columns:1fr}
+.stats-inner{grid-template-columns:repeat(2,1fr)}
+#nav{padding:1rem 1.5rem}
+.nav-links{display:none}
+}
+@media(max-width:500px){.stats-inner{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<div id="loader">
+  <div class="loader-logo">CYBER MASTER</div>
+  <div class="loader-bar"><div class="loader-fill" id="lf"></div></div>
+  <div class="loader-text" id="lt">INITIALIZING SECURE ENVIRONMENT...</div>
+</div>
+
+<nav id="nav">
+  <div class="nav-logo">⬡ CYBER MASTER</div>
+  <ul class="nav-links">
+    <li><a href="#about">À Propos</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#infra">Infrastructure</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Demander un audit</button>
+</nav>
+
+<section id="hero">
+  <canvas id="canvas3d"></canvas>
+  <div class="hero-content">
+    <div class="hero-tag">// CYBERSÉCURITÉ AVANCÉE · PROTECTION TOTALE</div>
+    <h1 class="hero-title">CYBER<br>MASTER</h1>
+    <p class="hero-sub">Sécurisez votre infrastructure.<br>Maîtrisez votre environnement numérique.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">▶ Découvrir nos services</button>
+      <button class="btn-outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Demander un audit</button>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <p>SCROLL</p>
+    <span></span>
+  </div>
+</section>
+
+<section id="about">
+  <div class="grid-bg"></div>
+  <div class="about-grid">
+    <div class="about-visual reveal-left">
+      <div class="hexgrid">
+        <div class="hex"><span class="hex-icon">🛡️</span><span class="hex-val">SOC</span><span class="hex-label">Operations</span></div>
+        <div class="hex"><span class="hex-icon">🔐</span><span class="hex-val">AES</span><span class="hex-label">256-bit</span></div>
+        <div class="hex"><span class="hex-icon">⚡</span><span class="hex-val">24/7</span><span class="hex-label">Monitoring</span></div>
+        <div class="hex"><span class="hex-icon">🌐</span><span class="hex-val">WAN</span><span class="hex-label">Security</span></div>
+        <div class="hex"><span class="hex-icon">🔬</span><span class="hex-val">AI</span><span class="hex-label">Détection</span></div>
+        <div class="hex"><span class="hex-icon">⚙️</span><span class="hex-val">DevOps</span><span class="hex-label">SecOps</span></div>
+      </div>
+    </div>
+    <div class="about-text reveal-right">
+      <span class="sec-label">// 01. À PROPOS</span>
+      <h2 class="sec-title">Expert en <span>Cybersécurité</span><br>& Infrastructures IT</h2>
+      <p>Cyber Master est une entreprise spécialisée dans la protection des systèmes d'information critiques. Nous combinons expertise technique de pointe et approche stratégique pour sécuriser vos actifs numériques.</p>
+      <p>De l'audit de sécurité au pentest offensif, en passant par l'administration réseau et la mise en place de solutions cloud sécurisées, notre équipe d'experts accompagne les organisations dans leur transformation sécurisée.</p>
+      <div class="tag-list">
+        <span class="tag">ISO 27001</span>
+        <span class="tag">OWASP</span>
+        <span class="tag">MITRE ATT&CK</span>
+        <span class="tag">Zero Trust</span>
+        <span class="tag">SOC 2</span>
+        <span class="tag">NIST CSF</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="scan-line"></div>
+  <div class="sec-header reveal">
+    <span class="sec-label">// 02. SERVICES</span>
+    <h2 class="sec-title">Solutions de <span>Protection</span> Totale</h2>
+    <p class="sec-sub">Un portfolio complet de services de cybersécurité pour répondre à toutes vos exigences de protection.</p>
+  </div>
+  <div class="services-grid">
+    <div class="svc-card reveal"><span class="svc-num">01</span><span class="svc-icon">🔍</span><h3 class="svc-title">Audit de Sécurité</h3><p class="svc-desc">Évaluation complète de votre posture de sécurité. Identification des vulnérabilités et recommandations stratégiques.</p></div>
+    <div class="svc-card reveal"><span class="svc-num">02</span><span class="svc-icon">⚔️</span><h3 class="svc-title">Pentest & Red Team</h3><p class="svc-desc">Tests d'intrusion offensifs simulant des attaques réelles pour identifier les failles avant les attaquants.</p></div>
+    <div class="svc-card reveal"><span class="svc-num">03</span><span class="svc-icon">🔥</span><h3 class="svc-title">Firewall & VPN</h3><p class="svc-desc">Déploiement et administration de pare-feu next-gen et solutions VPN sécurisées pour vos accès distants.</p></div>
+    <div class="svc-card reveal"><span class="svc-num">04</span><span class="svc-icon">🌐</span><h3 class="svc-title">Administration Réseau</h3><p class="svc-desc">Conception, déploiement et supervision de vos infrastructures réseau avec une approche Zero Trust.</p></div>
+    <div class="svc-card reveal"><span class="svc-num">05</span><span class="svc-icon">📊</span><h3 class="svc-title">Monitoring & SIEM</h3><p class="svc-desc">Surveillance continue 24/7 de votre SI avec détection et réponse aux incidents en temps réel.</p></div>
+    <div class="svc-card reveal"><span class="svc-num">06</span><span class="svc-icon">🏰</span><h3 class="svc-title">Sécurisation Systèmes</h3><p class="svc-desc">Hardening des OS, patch management et sécurisation des endpoints Windows et Linux.</p></div>
+    <div class="svc-card reveal"><span class="svc-num">07</span><span class="svc-icon">🗂️</span><h3 class="svc-title">Active Directory</h3><p class="svc-desc">Sécurisation et administration de vos annuaires AD, gestion des identités et contrôle d'accès.</p></div>
+    <div class="svc-card reveal"><span class="svc-num">08</span><span class="svc-icon">☁️</span><h3 class="svc-title">Sécurité Cloud</h3><p class="svc-desc">Architecture et sécurisation de vos environnements AWS, Azure et GCP. CSPM et conformité cloud.</p></div>
+    <div class="svc-card reveal"><span class="svc-num">09</span><span class="svc-icon">💻</span><h3 class="svc-title">Serveurs Linux/Windows</h3><p class="svc-desc">Administration avancée de serveurs critiques, virtualisation et haute disponibilité sécurisée.</p></div>
+  </div>
+</section>
+
+<section id="stats">
+  <div class="reveal">
+    <span class="sec-label" style="text-align:center;display:block;margin-bottom:1rem">// 03. CHIFFRES CLÉS</span>
+    <h2 class="sec-title" style="text-align:center;margin-bottom:3rem">Confiance & <span>Performance</span></h2>
+  </div>
+  <div class="stats-inner reveal">
+    <div>
+      <span class="stat-val" data-target="847" data-suffix="+">0</span>
+      <span class="stat-label">Systèmes protégés</span>
+    </div>
+    <div>
+      <span class="stat-val" data-target="99" data-suffix=".9%">0</span>
+      <span class="stat-label">Disponibilité garantie</span>
+    </div>
+    <div>
+      <span class="stat-val" data-target="4" data-suffix="min">0</span>
+      <span class="stat-label">Temps de réponse moyen</span>
+    </div>
+    <div>
+      <span class="stat-val" data-target="230" data-suffix="+">0</span>
+      <span class="stat-label">Clients satisfaits</span>
+    </div>
+  </div>
+</section>
+
+<section id="infra">
+  <canvas id="netcanvas"></canvas>
+  <div class="infra-content">
+    <div class="sec-header reveal">
+      <span class="sec-label">// 04. INFRASTRUCTURE</span>
+      <h2 class="sec-title">Réseau <span>Ultra-Sécurisé</span></h2>
+      <p class="sec-sub">Une architecture robuste et résiliente conçue pour les environnements critiques les plus exigeants.</p>
+    </div>
+    <div class="infra-grid">
+      <div class="infra-nodes reveal-left">
+        <div class="inode"><div><span class="inode-status"></span><span class="inode-name">Firewall NG</span></div><div class="inode-detail">Palo Alto · Active-Active</div></div>
+        <div class="inode"><div><span class="inode-status"></span><span class="inode-name">SOC Platform</span></div><div class="inode-detail">Splunk SIEM · 24/7</div></div>
+        <div class="inode"><div><span class="inode-status"></span><span class="inode-name">WAF Cluster</span></div><div class="inode-detail">ModSecurity · HAProxy</div></div>
+        <div class="inode"><div><span class="inode-status"></span><span class="inode-name">EDR Agent</span></div><div class="inode-detail">CrowdStrike Falcon</div></div>
+        <div class="inode"><div><span class="inode-status"></span><span class="inode-name">VPN Gateway</span></div><div class="inode-detail">WireGuard · OpenVPN</div></div>
+        <div class="inode"><div><span class="inode-status"></span><span class="inode-name">Backup Vault</span></div><div class="inode-detail">AES-256 · Offline</div></div>
+      </div>
+      <div class="reveal-right">
+        <p style="color:var(--muted);line-height:1.8;margin-bottom:1.5rem;font-weight:300">Notre infrastructure de sécurité est conçue selon les principes du Zero Trust et du Defense-in-Depth. Chaque couche est indépendamment sécurisée et surveillée.</p>
+        <p style="color:var(--muted);line-height:1.8;font-weight:300">Des datacenters Tier IV aux endpoints distribués, nous assurons une visibilité totale et un contrôle granulaire sur l'ensemble de votre surface d'attaque.</p>
+        <div style="margin-top:2rem;padding:1.5rem;border:1px solid rgba(0,255,100,.2);background:rgba(0,50,20,.3)">
+          <div style="font-family:var(--mono);font-size:.75rem;color:#0f0;margin-bottom:.5rem">STATUS: ALL SYSTEMS OPERATIONAL</div>
+          <div style="font-family:var(--mono);font-size:.7rem;color:var(--muted)">THREAT LEVEL: <span style="color:#ff0">MODERATE</span> · INCIDENTS: <span style="color:#0f0">0 ACTIVE</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials">
+  <div class="sec-header reveal" style="text-align:center">
+    <span class="sec-label">// 05. TÉMOIGNAGES</span>
+    <h2 class="sec-title">Ce que disent nos <span>clients</span></h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">Cyber Master a transformé notre posture sécuritaire en quelques semaines. L'audit initial a révélé des vulnérabilités critiques que nous ignorions. Professionnalisme exemplaire.</p>
+      <div class="testi-author"><div class="testi-avatar">JL</div><div><div class="testi-name">Jean-Luc Moreau</div><div class="testi-role">DSI · Groupe Industriel</div></div></div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">Le pentest a été d'une précision chirurgicale. Les rapports détaillés et la roadmap de remédiation nous ont permis d'agir rapidement et efficacement sur nos failles.</p>
+      <div class="testi-author"><div class="testi-avatar">AS</div><div><div class="testi-name">Amina Soumaré</div><div class="testi-role">RSSI · Banque Régionale</div></div></div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">Monitoring 24/7 impeccable. Quand nous avons subi une tentative d'intrusion, l'équipe a répondu en moins de 3 minutes. Réactivité et expertise hors du commun.</p>
+      <div class="testi-author"><div class="testi-avatar">PD</div><div><div class="testi-name">Pierre Dubois</div><div class="testi-role">CTO · Scale-Up Tech</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="grid-bg"></div>
+  <div class="contact-grid">
+    <div class="reveal-left">
+      <span class="sec-label">// 06. CONTACT</span>
+      <h2 class="sec-title" style="margin-bottom:1.5rem">Parlons de votre <span>sécurité</span></h2>
+      <p class="contact-info"><p style="color:var(--muted);line-height:1.7;font-weight:300;margin-bottom:2rem">Chaque organisation fait face à des défis uniques. Contactez-nous pour un audit de sécurité initial gratuit et sans engagement.</p></p>
+      <div class="contact-item"><span class="ci-icon">📍</span><div><div class="ci-label">Adresse</div><div class="ci-val">Lomé, Togo · Disponible à l'international</div></div></div>
+      <div class="contact-item"><span class="ci-icon">📧</span><div><div class="ci-label">Email</div><div class="ci-val">contact@cybermaster.io</div></div></div>
+      <div class="contact-item"><span class="ci-icon">🔒</span><div><div class="ci-label">Secure</div><div class="ci-val">PGP Key disponible sur demande</div></div></div>
+    </div>
+    <div class="reveal-right">
+      <form class="contact-form" onsubmit="return false">
+        <div class="form-group">
+          <input type="text" id="fname" placeholder="x">
+          <label for="fname">Nom complet</label>
+        </div>
+        <div class="form-group">
+          <input type="email" id="femail" placeholder="x">
+          <label for="femail">Email professionnel</label>
+        </div>
+        <div class="form-group">
+          <input type="text" id="forg" placeholder="x">
+          <label for="forg">Organisation</label>
+        </div>
+        <div class="form-group">
+          <textarea id="fmsg" placeholder="x"></textarea>
+          <label for="fmsg">Décrivez votre besoin</label>
+        </div>
+        <button class="btn-primary" type="submit" style="width:100%;clip-path:none">▶ Envoyer la demande</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">⬡ CYBER MASTER</div>
+  <div class="footer-sub" style="font-family:'Share Tech Mono',monospace;font-size:.75rem;color:rgba(0,170,255,.4)">SECURING THE DIGITAL FRONTIER</div>
+  <div class="social-links">
+    <div class="social-btn">in</div>
+    <div class="social-btn">🐦</div>
+    <div class="social-btn">gh</div>
+    <div class="social-btn">✉</div>
+  </div>
+  <div class="footer-copy">© 2025 CYBER MASTER · TOUS DROITS RÉSERVÉS · MADE WITH PRECISION & PURPOSE</div>
+</footer>
+
+<script>
+// CURSOR
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=(mx-4)+'px';cursor.style.top=(my-4)+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+  ring.style.left=(rx-18)+'px';ring.style.top=(ry-18)+'px';
+  requestAnimationFrame(animRing);
+}animRing();
+document.querySelectorAll('button,a,.svc-card,.hex').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2)';ring.style.opacity='0'});
+  el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';ring.style.opacity='1'});
+});
+
+// LOADER
+const fills=['INITIALIZING SECURE ENVIRONMENT...','LOADING CRYPTOGRAPHIC MODULES...','ESTABLISHING SECURE CONNECTION...','DEPLOYING INTERFACE...','ONLINE'];
+let li=0;
+setTimeout(()=>{document.getElementById('lf').style.width='100%'},100);
+const lt=document.getElementById('lt');
+const lti=setInterval(()=>{if(li<fills.length-1){li++;lt.textContent=fills[li]}else clearInterval(lti)},600);
+setTimeout(()=>{document.getElementById('loader').style.opacity='0';setTimeout(()=>document.getElementById('loader').style.display='none',800)},2800);
+
+// NAV SCROLL
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50);
+});
+
+// THREE.JS HERO
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,.1,1000);
+camera.position.set(0,0,8);
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('canvas3d'),alpha:true,antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+// Particles
+const pGeo=new THREE.BufferGeometry();
+const N=1800;
+const pos=new Float32Array(N*3);
+for(let i=0;i<N*3;i++)pos[i]=(Math.random()-.5)*30;
+pGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+const pMat=new THREE.PointsMaterial({color:0x0088ff,size:.04,transparent:true,opacity:.6});
+const particles=new THREE.Points(pGeo,pMat);
+scene.add(particles);
+
+// Laptop base (simplified 3D laptop representation)
+const laptopGroup=new THREE.Group();
+
+// Screen/lid
+const screenGeo=new THREE.BoxGeometry(3.4,.08,2.2);
+const metalMat=new THREE.MeshPhongMaterial({color:0x1a2a3a,shininess:80,specular:0x0066aa});
+const screen=new THREE.Mesh(screenGeo,metalMat);
+screen.position.y=.04;laptopGroup.add(screen);
+
+// Screen display
+const dispGeo=new THREE.BoxGeometry(3.1,.01,1.9);
+const dispMat=new THREE.MeshBasicMaterial({color:0x002244});
+const disp=new THREE.Mesh(dispGeo,dispMat);disp.position.y=.09;laptopGroup.add(disp);
+
+// Screen glow overlay
+const glowGeo=new THREE.PlaneGeometry(3,1.8);
+const glowMat=new THREE.MeshBasicMaterial({color:0x00aaff,transparent:true,opacity:.15});
+const glow=new THREE.Mesh(glowGeo,glowMat);
+glow.rotation.x=-Math.PI/2;glow.position.y=.1;laptopGroup.add(glow);
+
+// Keyboard base
+const baseGeo=new THREE.BoxGeometry(3.4,.15,2.4);
+const base=new THREE.Mesh(baseGeo,metalMat);
+base.position.y=-.1;base.position.z=.1;laptopGroup.add(base);
+
+// Keys grid
+for(let r=0;r<3;r++)for(let c=0;c<10;c++){
+  const kg=new THREE.BoxGeometry(.22,.06,.22);
+  const km=new THREE.MeshPhongMaterial({color:0x0d1a26,shininess:30});
+  const k=new THREE.Mesh(kg,km);
+  k.position.set(-1.1+c*.24,.06,-0.2+r*.26);
+  k.position.z+=.05;
+  laptopGroup.add(k);
+}
+
+// Glowing edge
+const edgeGeo=new THREE.BoxGeometry(3.42,.02,.02);
+const edgeMat=new THREE.MeshBasicMaterial({color:0x00ffff,transparent:true,opacity:.8});
+const edge=new THREE.Mesh(edgeGeo,edgeMat);
+edge.position.y=.01;edge.position.z=-1.08;laptopGroup.add(edge);
+
+laptopGroup.rotation.x=-.1;
+scene.add(laptopGroup);
+
+// Components (hidden initially, appear on scroll)
+const components=[];
+const compDefs=[
+  {name:'CPU',color:0x00aaff,size:[.8,.1,.8],pos:[-.8,.5,-1.5]},
+  {name:'RAM',color:0x0066ff,size:[1.4,.06,.2],pos:[.6,.5,-1.2]},
+  {name:'GPU',color:0x0044cc,size:[1.2,.1,.5],pos:[-.5,.5,.5]},
+  {name:'SSD',color:0x00ccaa,size:[.9,.06,.5],pos:[.7,.5,.3]},
+  {name:'MB',color:0x003322,size:[2.5,.05,2],pos:[0,.5,-.2]},
+];
+compDefs.forEach(d=>{
+  const g=new THREE.BoxGeometry(...d.size);
+  const m=new THREE.MeshPhongMaterial({color:d.color,shininess:60,transparent:true,opacity:0,wireframe:false});
+  const mesh=new THREE.Mesh(g,m);
+  mesh.position.set(...d.pos);
+  mesh.userData.targetPos=new THREE.Vector3(...d.pos);
+  mesh.userData.startPos=laptopGroup.position.clone();
+  scene.add(mesh);
+  components.push(mesh);
+
+  // Wireframe overlay
+  const wg=new THREE.EdgesGeometry(g);
+  const wm=new THREE.LineBasicMaterial({color:d.color,transparent:true,opacity:0});
+  const wf=new THREE.LineSegments(wg,wm);
+  wf.position.set(...d.pos);
+  scene.add(wf);
+  components.push(wf);
+});
+
+// Lights
+scene.add(new THREE.AmbientLight(0x001122,.8));
+const bl=new THREE.PointLight(0x0088ff,2,20);bl.position.set(0,5,5);scene.add(bl);
+const cl=new THREE.PointLight(0x00ffff,1,15);cl.position.set(-5,3,-5);scene.add(cl);
+
+// Mouse parallax
+let tmx=0,tmy=0,cmx=0,cmy=0;
+document.addEventListener('mousemove',e=>{
+  tmx=(e.clientX/window.innerWidth-.5)*.3;
+  tmy=(e.clientY/window.innerHeight-.5)*.2;
+});
+
+let scrollY=0;
+window.addEventListener('scroll',()=>scrollY=window.scrollY);
+
+renderer.setAnimationLoop(()=>{
+  cmx+=(tmx-cmx)*.05;cmy+=(tmy-cmy)*.05;
+  particles.rotation.y+=.0004;particles.rotation.x+=.0001;
+
+  const sp=scrollY/window.innerHeight;
+  laptopGroup.rotation.y=cmx+sp*1.5;
+  laptopGroup.rotation.x=cmy-.1+sp*.3;
+  laptopGroup.position.y=-sp*3;
+  laptopGroup.scale.setScalar(Math.max(.1,1-sp*.8));
+
+  // Reveal components on scroll
+  components.forEach((c,i)=>{
+    const targetOp=sp>.3?Math.min(1,(sp-.3)*3):0;
+    if(c.material){
+      c.material.opacity+=( targetOp-c.material.opacity)*.05;
+      if(sp>.3){
+        c.position.y+=(.5+Math.sin(Date.now()*.001+i)*.05-c.position.y)*.03;
+        c.rotation.y+=.005;
+      }
+    }
+  });
+
+  bl.position.x=Math.sin(Date.now()*.001)*3;
+  glowMat.opacity=.08+Math.sin(Date.now()*.002)*.05;
+  renderer.render(scene,camera);
+});
+
+window.addEventListener('resize',()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+// NETWORK CANVAS
+const nc=document.getElementById('netcanvas');
+const nctx=nc.getContext('2d');
+function resizeNet(){nc.width=nc.offsetWidth;nc.height=nc.offsetHeight}
+resizeNet();window.addEventListener('resize',resizeNet);
+const nodes=Array.from({length:25},()=>({
+  x:Math.random()*nc.width,y:Math.random()*nc.height,
+  vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*2+1
+}));
+function drawNet(){
+  nctx.clearRect(0,0,nc.width,nc.height);
+  nodes.forEach(n=>{
+    n.x+=n.vx;n.y+=n.vy;
+    if(n.x<0||n.x>nc.width)n.vx*=-1;
+    if(n.y<0||n.y>nc.height)n.vy*=-1;
+    nctx.beginPath();nctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    nctx.fillStyle='rgba(0,170,255,.7)';nctx.fill();
+  });
+  nodes.forEach((a,i)=>nodes.forEach((b,j)=>{
+    if(i>=j)return;
+    const d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(d<140){
+      nctx.beginPath();nctx.moveTo(a.x,a.y);nctx.lineTo(b.x,b.y);
+      nctx.strokeStyle=`rgba(0,170,255,${.35*(1-d/140)})`;
+      nctx.lineWidth=.5;nctx.stroke();
+    }
+  }));
+  requestAnimationFrame(drawNet);
+}drawNet();
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.15});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>obs.observe(el));
+
+// COUNTER ANIMATION
+const cobs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const el=e.target;
+      const target=+el.dataset.target;
+      const suffix=el.dataset.suffix||'';
+      let cur=0;const dur=2000;const step=16;
+      const inc=target/(dur/step);
+      const t=setInterval(()=>{
+        cur=Math.min(cur+inc,target);
+        el.textContent=Math.floor(cur)+suffix;
+        if(cur>=target)clearInterval(t);
+      },step);
+      cobs.unobserve(el);
+    }
+  });
+},{threshold:.5});
+document.querySelectorAll('[data-target]').forEach(el=>cobs.observe(el));
+</script>
+</body>
+</html>
